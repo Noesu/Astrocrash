@@ -104,6 +104,36 @@ class Asteroid(Wrapper):
         super(Asteroid, self).die()
 
 
+class Station(Wrapper):
+    """ An unknown object which floats across the screen. """
+    image = games.load_image("unbreakable.png")
+
+    SPEED = 1
+    DEFENCE = 20
+    # SPAWN = 2
+    POINTS = 50
+
+    total = 0
+
+    def __init__(self, game, x, y):
+        """ Initialize asteroid sprite. """
+        super(Station, self).__init__(
+            image=Station.image,
+            x=x, y=y,
+            dx=random.choice([1, -1]) * Station.SPEED * random.random(),
+            dy=random.choice([1, -1]) * Station.SPEED * random.random())
+
+        self.game = game
+
+    def die(self):
+        """ Destroy object. """
+        self.DEFENCE -= 10
+        if self.DEFENCE == 0:
+            self.game.score.value += Station.POINTS
+            self.game.score.right = games.screen.width - 10
+            super(Station, self).die()
+
+
 class Ship(Collider):
     """ The player's ship. """
     image = games.load_image("ship.bmp")
@@ -294,6 +324,11 @@ class Game(object):
                                     x=x, y=y,
                                     size=Asteroid.LARGE)
             games.screen.add(new_asteroid)
+
+            # create station
+            new_station = Station(game=self,
+                                  x=x, y=y)
+            games.screen.add(new_station)
 
         # display level number
         level_message = games.Message(value="Level " + str(self.level),
